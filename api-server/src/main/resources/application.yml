@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    # MySQL 접속 정보 (보안 옵션 & 한글 설정 포함)
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update  # 테이블이 없으면 자동 생성
+    show-sql: true      # 콘솔에 쿼리 출력
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    root: INFO                     # 기본은 중요 정보만 봄
+    com.baedal: DEBUG              # 내 코드는 자세히 봄 (SQL 파라미터 등)
+    org.hibernate.SQL: DEBUG       # 실행되는 쿼리문 보기
+    org.hibernate.orm.jdbc.bind: TRACE # 쿼리 '?'에 들어가는 값 보기 (선택사항)
+  
+  file:
+    name: logs/baedal-server.log   # ✅ 로그를 파일로 저장 (서버 꺼져도 남음)
+  
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" # 보기 편한 포맷
