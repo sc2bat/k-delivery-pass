@@ -1,4 +1,6 @@
 // lib/scraper.js
+require('dotenv').config();
+
 const puppeteer = require('puppeteer');
 
 // 가격 문자열에서 숫자만 추출하는 헬퍼 함수
@@ -10,7 +12,7 @@ function parsePrice(priceStr) {
 // 브라우저 초기화
 async function initBrowser() {
     const browser = await puppeteer.launch({
-        headless: false,
+        headless: process.env.PUPPETEER_HEADLESS === 'false' ? false : "new",
         executablePath: '/usr/bin/google-chrome',
         args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-notifications', '--window-size=1280,960']
     });
