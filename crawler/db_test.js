@@ -2,7 +2,7 @@ require('dotenv').config();
 const mysql = require('mysql2/promise');
 
 async function testDB() {
-    console.log('🔌 DB 접속 테스트 시작...');
+    console.log('DB 접속 테스트 시작...');
     console.log(`   - Host: ${process.env.DB_HOST}`);
     console.log(`   - User: ${process.env.DB_USER}`);
     console.log(`   - Port: ${process.env.DB_PORT || 3306}`);
@@ -25,7 +25,7 @@ async function testDB() {
         console.log(' DB 연결 성공!');
         
         const [rows] = await connection.execute('SELECT 1 as val');
-        console.log(' 쿼리 결과(1이 나오면 정상):', rows);
+        console.log(' 쿼리 결과:', rows);
 
         await connection.end();
     } catch (e) {
@@ -33,7 +33,7 @@ async function testDB() {
         console.error('   -> 에러 코드:', e.code);
         
         if (e.code === 'ETIMEDOUT') {
-             console.error('💡 힌트: .env 파일에서 DB_HOST를 "localhost" 대신 "127.0.0.1"로 바꿔보세요.');
+             console.error('힌트: .env 파일에서 DB_HOST를 "localhost" 대신 "127.0.0.1"로 바꿔보세요.');
         }
     }
 }
