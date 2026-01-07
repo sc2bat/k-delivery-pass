@@ -22,7 +22,7 @@ logging:
     org.hibernate.orm.jdbc.bind: TRACE # 쿼리 '?'에 들어가는 값 보기 (선택사항)
   
   file:
-    name: logs/baedal-server.log   # ✅ 로그를 파일로 저장 (서버 꺼져도 남음)
+    name: logs/baedal-server.log   #  로그를 파일로 저장 (서버 꺼져도 남음)
   
   pattern:
     console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" # 보기 편한 포맷
