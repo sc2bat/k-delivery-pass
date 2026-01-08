@@ -10,7 +10,7 @@ async function main() {
     // 1. DB에서 카테고리 가져오기
     let categoryRows = [];
     try {
-        const [rows] = await pool.query("SELECT name FROM categories WHERE is_active = TRUE");
+        const [rows] = await pool.query("SELECT id, name FROM categories WHERE is_active = TRUE");
         categoryRows = rows;
         logger.info(` 수집 대상: ${categoryRows.length}개 카테고리`);
     } catch (e) {
@@ -26,7 +26,7 @@ async function main() {
     // 3. 카테고리별 순회
     for (const cat of categoryRows) {
         const keyword = `${region} ${cat.name}`;
-        logger.info(`\n검색: "${keyword}"`);
+        logger.info(`\n검색: "${keyword}" (ID: ${cat.id})`);
 
         try {
             // 스크래퍼 모듈을 통해 가게 목록 가져오기
@@ -72,25 +72,31 @@ async function saveToDB(store, menuData, region) {
         
         // 가게 저장
         const [storeRes] = await connection.query(`
-            INSERT INTO stores (store_name, category, address, origin_url, is_open)
+            INSERT INTO stores (store_name, category_id, address, origin_url, is_open)
             VALUES (?, ?, ?, ?, 'Y')
-            ON DUPLICATE KEY UPDATE category = VALUES(category), last_updated = NOW()
-        `, [store.name, store.category, region, homeUrl]);
+            ON DUPLICATE KEY UPDATE 
+                category_id = VALUES(category_id), 
+                last_updated = NOW()
+        `, [store.name, categoryId, region, homeUrl]);
 
         let storeId = storeRes.insertId;
         if (storeId === 0) {
             const [rows] = await connection.query('SELECT store_id FROM stores WHERE store_name = ?', [store.name]);
-            storeId = rows[0].store_id;
+            if (rows.length > 0) {
+                storeId = rows[0].store_id;
+            } else {
+                throw new Error(`가게 ID 조회 실패: ${store.name}`);
+            }
         }
 
         // 메뉴 저장
         for (const m of menuData) {
-            const priceInt = scraper.parsePrice(m.price); // 유틸 함수 사용
+            const priceInt = scraper.parsePrice(m.price);
             await connection.query(`
                 INSERT INTO menus (store_id, menu_name_kr, price, image_url, description)
                 VALUES (?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE price = ?, description = ?
-            `, [storeId, m.name, priceInt, m.img, m.desc, priceInt, m.desc]);
+                ON DUPLICATE KEY UPDATE price = VALUES(price), description = VALUES(description), image_url = VALUES(image_url)
+            `, [storeId, m.name, priceInt, m.img, m.desc]);
         }
         await connection.commit();
     } catch (err) {
