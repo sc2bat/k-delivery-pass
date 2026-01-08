@@ -38,10 +38,10 @@ async function main() {
                 logger.info(`   Processing: ${store.name}`);
                 
                 // 스크래퍼 모듈을 통해 메뉴 가져오기
-                const menuData = await scraper.fetchMenus(page, store.url);
+                const menuData = await scraper.fetchMenus(page, store.url, cat.id);
 
                 if (menuData.length > 0) {
-                    await saveToDB(store, menuData, region);
+                    await saveToDB(store, menuData, region, cat.id);
                     logger.info(`      - 메뉴 ${menuData.length}개 저장 완료`);
                 } else {
                     logger.warn(`      (메뉴 정보 없음)`);
@@ -63,7 +63,7 @@ async function main() {
 }
 
 // DB 저장 함수 (트랜잭션 관리 때문에 여기 두는 것이 좋음, 혹은 service 폴더로 빼도 됨)
-async function saveToDB(store, menuData, region) {
+async function saveToDB(store, menuData, region, categoryId) {
     const connection = await pool.getConnection();
     try {
         await connection.beginTransaction();
