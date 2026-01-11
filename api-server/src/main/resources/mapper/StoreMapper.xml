@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.baedal.pass.mapper.StoreMapper">
+
+    <select id="selectStores" resultType="com.baedal.pass.domain.Store">
+        SELECT 
+            s.store_id,
+            s.category_id,
+            c.name AS category_name,  s.store_name,
+            s.address,
+            s.phone,
+            s.description,
+            
+            s.open_time,
+            s.close_time,
+            
+            s.min_order_price,
+            s.delivery_fee,
+            s.is_open,
+            
+            s.rating_average,
+            s.review_count,
+            s.last_updated,
+
+            (
+                SELECT image_url 
+                FROM menus m 
+                WHERE m.store_id = s.store_id 
+                  AND m.image_url IS NOT NULL 
+                LIMIT 1
+            ) AS thumbnail
+
+        FROM stores s
+        JOIN categories c ON s.category_id = c.id
+        WHERE 1=1
+        
+        <if test="categoryId != null">
+            AND s.category_id = #{categoryId}
+        </if>
+        
+        ORDER BY 
+            s.is_open DESC,        
+            s.rating_average DESC,
+            s.store_id DESC
+    </select>
+
+
+    <resultMap id="StoreDetailMap" type="com.baedal.pass.domain.Store">
+        <id property="storeId" column="store_id"/>
+        <result property="storeName" column="store_name"/>
+        <result property="address" column="address"/>
+        <result property="phone" column="phone"/>
+        <result property="deliveryFee" column="delivery_fee"/>
+        <result property="minOrderPrice" column="min_order_price"/>
+        <result property="description" column="store_description"/> <result property="ratingAverage" column="rating_average"/>
+        <result property="reviewCount" column="review_count"/>
+        <result property="openTime" column="open_time"/>
+        <result property="closeTime" column="close_time"/>
+        
+        <collection property="menus" ofType="com.baedal.pass.domain.Menu">
+            <id property="menuId" column="menu_id"/>
+            <result property="menuNameKr" column="menu_name_kr"/>
+            <result property="price" column="price"/>
+            <result property="imageUrl" column="image_url"/>
+            <result property="description" column="menu_description"/> <result property="isSoldOut" column="is_sold_out"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectStoreDetail" resultMap="StoreDetailMap">
+        SELECT 
+            s.store_id,
+            s.store_name,
+            s.address,
+            s.phone,
+            s.delivery_fee,
+            s.min_order_price,
+            s.description AS store_description,  s.rating_average,
+            s.review_count,
+            s.open_time,
+            s.close_time,
+            
+            m.menu_id,
+            m.menu_name_kr,
+            m.price,
+            m.image_url,
+            m.description AS menu_description,
+            m.is_sold_out
+        FROM stores s
+        LEFT JOIN menus m ON s.store_id = m.store_id
+        WHERE s.store_id = #{storeId}
+        ORDER BY m.menu_id ASC
+    </select>
+</mapper>

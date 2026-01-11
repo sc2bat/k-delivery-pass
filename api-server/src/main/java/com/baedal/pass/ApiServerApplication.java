@@ -1,5 +1,6 @@
-package com.baedal.api;
+package com.baedal.pass;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import lombok.extern.slf4j.Slf4j; 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,6 +9,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 @Slf4j
 @SpringBootApplication
+@MapperScan("com.baedal.pass.mapper")
 public class ApiServerApplication {
 
 	public static void main(String[] args) {
