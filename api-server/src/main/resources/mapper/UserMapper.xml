@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.baedal.pass.mapper.UserMapper">
+
+    <select id="findByProvider" resultType="com.baedal.pass.domain.User">
+        SELECT *
+        FROM users
+        WHERE provider = #{provider}
+          AND provider_id = #{providerId}
+    </select>
+    
+    <select id="findById" resultType="com.baedal.pass.domain.User">
+        SELECT *
+        FROM users
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO users (
+            email, 
+            password, 
+            nickname, 
+            phone_number, 
+            role, 
+            fcm_token, 
+            provider, 
+            provider_id, 
+            created_at, 
+            updated_at
+        ) VALUES (
+            #{email}, 
+            #{password}, 
+            #{nickname}, 
+            #{phoneNumber}, 
+            #{role}, 
+            #{fcmToken}, 
+            #{provider}, 
+            #{providerId}, 
+            NOW(), 
+            NOW()
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE users
+        SET 
+            nickname = #{nickname},
+            updated_at = NOW()
+            WHERE user_id = #{userId}
+    </update>
+
+</mapper>
